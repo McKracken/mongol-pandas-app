@@ -1,15 +1,17 @@
 package mckracken.co.uk.mongolpandasapp;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
-    private TextView mTextMessage;
+public class MainActivity extends AppCompatActivity implements DashboardFragment.OnDashboardFragmentInteractionListener, EventFragment.OnEventFragmentInteractionListener {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -17,14 +19,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                    DashboardFragment dashboardFragment = DashboardFragment.newInstance();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content, dashboardFragment).commit();
                     return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
+                case R.id.navigation_event:
+                    EventFragment eventFragment = EventFragment.newInstance();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content, eventFragment).commit();
                     return true;
             }
             return false;
@@ -32,14 +35,29 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+    private FrameLayout frameLayout;
+    private BottomNavigationView navigation;
+    private FusedLocationProviderClient mFusedLocationClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setSelectedItemId(R.id.navigation_dashboard);
+        frameLayout = (FrameLayout) findViewById(R.id.content);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
     }
 
+    @Override
+    public void onEventFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onDashboardFragmentInteraction(Uri uri) {
+
+    }
 }

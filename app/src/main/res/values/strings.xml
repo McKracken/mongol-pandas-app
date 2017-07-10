@@ -3,4 +3,20 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_event">Event</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="heat1">heat1</string>
+    <string name="heat2">heat2</string>
+    <string name="start_recording">Start recording</string>
+    <string name="take_picture">Take picture</string>
+    <string name="ip">IP address</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="send_event">Send Event</string>
+    <string name="console">Console</string>
+    <string name="stop_recording">Stop recording</string>
+    <string name="picture_taken">Picture taken</string>
+    <string name="video_taken">Video taken</string>
 </resources>

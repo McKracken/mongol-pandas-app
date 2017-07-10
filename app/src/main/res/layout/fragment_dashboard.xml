@@ -1,0 +1,92 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="mckracken.co.uk.mongolpandasapp.DashboardFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/label_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/ip"
+            android:labelFor="@+id/ip_text"/>
+
+        <EditText
+            android:id="@id/ip_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="@string/ip" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/label_console"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/console"
+            android:labelFor="@+id/console_text"/>
+
+        <TextView
+            android:id="@id/console_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="@string/console" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/labelHeat1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/heat1"
+            android:labelFor="@+id/heat1"/>
+
+        <EditText
+            android:id="@id/heat1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="@string/heat1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/labelHeat2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/heat2"
+            android:labelFor="@+id/heat2"/>
+
+        <EditText
+            android:id="@id/heat2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="@string/heat2" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/start_recording_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_recording"/>
+
+    <Button
+        android:id="@+id/take_picture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/take_picture"/>
+
+</LinearLayout>
