@@ -1,15 +1,22 @@
 package mckracken.co.uk.mongolpandasapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,72 +78,76 @@ public class EventFragment extends Fragment {
     }
 
     public void sendEvent() {
-        String title = eventTitleEditText.getText().toString();
-        String description = eventDescriptionEditText.getText().toString();
+        final String title = eventTitleEditText.getText().toString();
+        final String description = eventDescriptionEditText.getText().toString();
 
+        FusedLocationProviderClient locationClient = ((MainActivity)getActivity()).getLocationClient();
         // TODO I should take this from the gps provider
-        double latitude = -4.30293;
-        double longitude = 11.02934;
+        locationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        final OkHttpClient client = new OkHttpClient();
+                        JSONObject toSend = new JSONObject();
 
-        final OkHttpClient client = new OkHttpClient();
-        JSONObject toSend = new JSONObject();
+                        try {
+                            toSend.put("title", title);
+                            toSend.put("description", description);
+                            toSend.put("lat", location.getLatitude());
+                            toSend.put("lon",location.getLongitude());
 
-        try {
-            toSend.put("title", title);
-            toSend.put("description", description);
-            toSend.put("lat", latitude);
-            toSend.put("lon",longitude);
+                            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+                            RequestBody body = RequestBody.create(JSON, toSend.toString());
 
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-            RequestBody body = RequestBody.create(JSON, toSend.toString());
+                            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                            String ip = sp.getString("ip", "");
+                            // TODO where the hell do I take the url?
+                            final Request request = new Request.Builder()
+                                    .url("http://" + ip + ":5001/signalevent")
+                                    .post(body)
+                                    .build();
 
-            // TODO where the hell do I take the url?
-            final Request request = new Request.Builder()
-                    .url("http://192.168.0.4:5001/signalevent")
-                    .post(body)
-                    .build();
+                            AsyncTask<Void, Void, Integer> asyncTask = new AsyncTask<Void, Void, Integer>() {
 
-            AsyncTask<Void, Void, Integer> asyncTask = new AsyncTask<Void, Void, Integer>() {
+                                @Override
+                                protected Integer doInBackground(Void... voids) {
+                                    try {
+                                        Response response = client.newCall(request).execute();
+                                        return response.code();
+                                    }
+                                    catch (IOException e){
+                                        return 0;
+                                    }
 
-                @Override
-                protected Integer doInBackground(Void... voids) {
-                    try {
-                        Response response = client.newCall(request).execute();
-                        return response.code();
+                                }
+
+                                @Override
+                                protected void onPostExecute(Integer statusCode) {
+                                    super.onPostExecute(statusCode);
+
+                                    if(statusCode == 200){
+                                        Toast.makeText(getActivity(), "Message sent" , Toast.LENGTH_SHORT).show();
+                                        ((MainActivity)getActivity()).onEventMessageSent();
+                                    }
+                                    else {
+                                        // TODO report something somewhere, like a Toast
+                                        Toast.makeText(getActivity(), "Error" + statusCode, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            };
+                            asyncTask.execute();
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    catch (IOException e){
-                        return 0;
-                    }
-
-                }
-
-                @Override
-                protected void onPostExecute(Integer statusCode) {
-                    super.onPostExecute(statusCode);
-
-                    if(statusCode == 200){
-                        // TODO
-                    }
-                    else {
-                        // TODO report something somewhere, like a Toast
-                    }
-                }
-            };
-            asyncTask.execute();
+                });
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onEventFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -167,6 +178,6 @@ public class EventFragment extends Fragment {
      */
     public interface OnEventFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onEventFragmentInteraction(Uri uri);
+        void onEventMessageSent();
     }
 }

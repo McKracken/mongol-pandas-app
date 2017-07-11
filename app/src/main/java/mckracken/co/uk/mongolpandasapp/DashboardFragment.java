@@ -1,10 +1,14 @@
 package mckracken.co.uk.mongolpandasapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -25,9 +30,16 @@ public class DashboardFragment extends Fragment {
 
     private OnDashboardFragmentInteractionListener mListener;
     private Button recordVideoButton;
-    private TextView consoleTextView;
+    //private TextView consoleTextView;
     private EditText ipEditText;
     private Button takePictureButton;
+    private TextView heat1TextView;
+    private TextView heat2TextView;
+    private Button ipSetButton;
+
+    //private BottomNavigationView navigationView;
+
+    private String ipAddress;
 
     public DashboardFragment() {
         // Required empty public constructor
@@ -55,15 +67,32 @@ public class DashboardFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        consoleTextView = (TextView) view.findViewById(R.id.console_text);
+        ipAddress = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("ip", "");
+
+        //consoleTextView = (TextView) view.findViewById(R.id.console_text);
         ipEditText = (EditText) view.findViewById(R.id.ip_text);
+        ipEditText.setText(ipAddress);
+        //navigationView = ((MainActivity)getActivity()).getNavigation();
         takePictureButton = (Button) view.findViewById(R.id.take_picture);
         recordVideoButton = (Button) view.findViewById(R.id.start_recording_button);
+        heat1TextView = (TextView) view.findViewById(R.id.heat1);
+        heat2TextView = (TextView) view.findViewById(R.id.heat2);
         recordVideoButton.setOnClickListener(startRecordingListener());
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 takePicture();
+            }
+        });
+        ipSetButton = (Button) view.findViewById(R.id.ip_set_button);
+        ipSetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("ip", ipAddress);
+                editor.apply();
+                Toast.makeText(getActivity(), ipAddress + " saved", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -97,10 +126,14 @@ public class DashboardFragment extends Fragment {
     // 6) We might want to make the console be a Toast
 
     public void startRecording(){
-
-        String url = "http://" + ipEditText.getText() + ":5001/startvideo";
+        recordVideoButton.setEnabled(false);
+        takePictureButton.setEnabled(false);
+        //disableNavigation();
+        String url = "http://" + ipAddress + ":5001/startvideo";
         // make HTTP request
-        final OkHttpClient client = new OkHttpClient();
+        final OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .build();
 
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(JSON, "{}");
@@ -126,22 +159,38 @@ public class DashboardFragment extends Fragment {
             @Override
             protected void onPostExecute(Integer statusCode) {
                 super.onPostExecute(statusCode);
-                consoleTextView.setText(String.valueOf(statusCode));
+                //consoleTextView.setText(String.valueOf(statusCode));
+                recordVideoButton.setEnabled(true);
+                //enableNavigation();
 
                 if(statusCode == 200){
                     recordVideoButton.setText(R.string.stop_recording);
                     recordVideoButton.setOnClickListener(stopRecordingListener());
-
+                    Toast.makeText(getActivity(), "Video started", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getActivity(), "Error: " + statusCode, Toast.LENGTH_SHORT).show();
+                    takePictureButton.setEnabled(true);
                 }
             }
         };
         asyncTask.execute();
     }
 
+    /*private void disableNavigation(){
+        ((MainActivity)getActivity()).disableNavigation();
+    }
+
+    private void enableNavigation(){
+        ((MainActivity)getActivity()).enableNavigation();
+    }*/
+
     public void stopRecording(){
-        String url = "http://" + ipEditText.getText() + ":5001/stopvideo";
+        recordVideoButton.setEnabled(false);
+        String url = "http://" + ipAddress + ":5001/stopvideo";
         // make HTTP request
-        final OkHttpClient client = new OkHttpClient();
+        final OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .build();
 
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(JSON, "{}");
@@ -167,8 +216,9 @@ public class DashboardFragment extends Fragment {
             @Override
             protected void onPostExecute(Integer statusCode) {
                 super.onPostExecute(statusCode);
-                consoleTextView.setText(String.valueOf(statusCode));
-
+                //consoleTextView.setText(String.valueOf(statusCode));
+                recordVideoButton.setEnabled(true);
+                takePictureButton.setEnabled(true);
                 if(statusCode == 200){
                     Toast.makeText(getActivity(), R.string.video_taken, Toast.LENGTH_SHORT).show();
                     recordVideoButton.setText(R.string.start_recording);
@@ -180,10 +230,18 @@ public class DashboardFragment extends Fragment {
         asyncTask.execute();
     }
 
+    public void setHeatValues(Double heat1, Double heat2){
+        heat1TextView.setText(String.valueOf(heat1));
+        heat2TextView.setText(String.valueOf(heat2));
+    }
+
     public void takePicture(){
-        String url = "http://" + ipEditText.getText() + ":5001/shootpicture";
+        recordVideoButton.setEnabled(false);
+        String url = "http://" + ipAddress + ":5001/shootpicture";
         // make HTTP request
-        final OkHttpClient client = new OkHttpClient();
+        final OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .build();
 
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(JSON, "{}");
@@ -209,22 +267,14 @@ public class DashboardFragment extends Fragment {
             @Override
             protected void onPostExecute(Integer statusCode) {
                 super.onPostExecute(statusCode);
-                consoleTextView.setText(String.valueOf(statusCode));
-
+                //consoleTextView.setText(String.valueOf(statusCode));
+                recordVideoButton.setEnabled(true);
                 if(statusCode == 200){
                     Toast.makeText(getActivity(), R.string.picture_taken, Toast.LENGTH_SHORT).show();
                 }
             }
         };
         asyncTask.execute();
-    }
-
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onDashboardFragmentInteraction(uri);
-        }
     }
 
     @Override

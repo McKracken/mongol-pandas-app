@@ -19,4 +19,5 @@
     <string name="stop_recording">Stop recording</string>
     <string name="picture_taken">Picture taken</string>
     <string name="video_taken">Video taken</string>
+    <string name="set">Set</string>
 </resources>
