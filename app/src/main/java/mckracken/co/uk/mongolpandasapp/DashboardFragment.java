@@ -88,6 +88,14 @@ public class DashboardFragment extends Fragment {
         };
     }
 
+    // TODO s
+    // 1) if IP is missing, we need to prevent everything
+    // 2) until stop recording is ok, take picture has to be disabled
+    // 3) every request need to have a timeout
+    // 4) keyboard should disappear when I click somewhere else?
+    // 5) MAYBE, we can add a reset button which reset the camera
+    // 6) We might want to make the console be a Toast
+
     public void startRecording(){
 
         String url = "http://" + ipEditText.getText() + ":5001/startvideo";
@@ -128,8 +136,6 @@ public class DashboardFragment extends Fragment {
             }
         };
         asyncTask.execute();
-
-
     }
 
     public void stopRecording(){
