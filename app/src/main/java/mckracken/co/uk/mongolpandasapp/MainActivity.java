@@ -128,6 +128,21 @@ public class MainActivity extends AppCompatActivity implements DashboardFragment
                                             JSONObject respObject = new JSONObject();
                                             respObject.put("latitude", location.getLatitude());
                                             respObject.put("longitude", location.getLongitude());
+
+                                            if(location.hasAltitude()) {
+                                                respObject.put("altitude", location.getAltitude());
+                                            }
+                                            else {
+                                                respObject.put("altitude", -1.0);
+                                            }
+
+                                            if(location.hasSpeed()) {
+                                                respObject.put("kph", location.getSpeed());
+                                            }
+                                            else {
+                                                respObject.put("kph", -1.0);
+                                            }
+
                                             response.send(respObject);
                                         }
                                     } catch (JSONException e) {
@@ -141,6 +156,13 @@ public class MainActivity extends AppCompatActivity implements DashboardFragment
                 // others exception could be caught
 
             }
+        });
+        server.get("/ack",new HttpServerRequestCallback() {
+                    @Override
+                    public void onRequest(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
+                        response.code(200);
+                        response.send("OK");
+                    }
         });
         server.listen(mAsyncServer, 8080);
     }
