@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements DashboardFragment
 
             }
         });
-        server.get("/ack",new HttpServerRequestCallback() {
+        server.get("/ack", new HttpServerRequestCallback() {
                     @Override
                     public void onRequest(final AsyncHttpServerRequest request, final AsyncHttpServerResponse response) {
                         response.code(200);

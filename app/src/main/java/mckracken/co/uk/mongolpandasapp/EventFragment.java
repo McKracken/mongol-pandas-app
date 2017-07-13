@@ -93,8 +93,15 @@ public class EventFragment extends Fragment {
                         try {
                             toSend.put("title", title);
                             toSend.put("description", description);
-                            toSend.put("lat", location.getLatitude());
-                            toSend.put("lon",location.getLongitude());
+                            toSend.put("latitude", location.getLatitude());
+                            toSend.put("longitude",location.getLongitude());
+
+                            if(location.hasAltitude()) {
+                                toSend.put("altitude", location.getAltitude());
+                            }
+                            else {
+                                toSend.put("altitude", -1.0);
+                            }
 
                             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
                             RequestBody body = RequestBody.create(JSON, toSend.toString());
