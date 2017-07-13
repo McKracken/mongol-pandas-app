@@ -108,8 +108,6 @@ public class EventFragment extends Fragment {
 
                             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
                             String ip = sp.getString("ip", "");
-                            // TODO where the hell do I take the url?
-                            ip = "192.168.43.100";
                             final Request request = new Request.Builder()
                                     .url("http://" + ip + ":5001/signalevent")
                                     .post(body)
