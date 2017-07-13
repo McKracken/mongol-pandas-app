@@ -129,6 +129,7 @@ public class DashboardFragment extends Fragment {
         recordVideoButton.setEnabled(false);
         takePictureButton.setEnabled(false);
         //disableNavigation();
+        String ipAddress = "192.168.43.100";
         String url = "http://" + ipAddress + ":5001/startvideo";
         // make HTTP request
         final OkHttpClient client = new OkHttpClient.Builder()
@@ -186,6 +187,7 @@ public class DashboardFragment extends Fragment {
 
     public void stopRecording(){
         recordVideoButton.setEnabled(false);
+        String ipAddress = "192.168.43.100";
         String url = "http://" + ipAddress + ":5001/stopvideo";
         // make HTTP request
         final OkHttpClient client = new OkHttpClient.Builder()
@@ -237,6 +239,7 @@ public class DashboardFragment extends Fragment {
 
     public void takePicture(){
         recordVideoButton.setEnabled(false);
+        String ipAddress = "192.168.43.100";
         String url = "http://" + ipAddress + ":5001/shootpicture";
         // make HTTP request
         final OkHttpClient client = new OkHttpClient.Builder()
